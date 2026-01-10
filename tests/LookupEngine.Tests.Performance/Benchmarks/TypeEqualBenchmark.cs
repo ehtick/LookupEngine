@@ -14,11 +14,9 @@
 
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Performance;
+namespace LookupEngine.Tests.Performance.Benchmarks;
 
-[MediumRunJob]
-[MemoryDiagnoser]
-public sealed class TypeEqualBenchmark
+public class TypeEqualBenchmark
 {
     private object Object { get; set; } = new RoundButton();
 

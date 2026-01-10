@@ -15,11 +15,9 @@
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 
-namespace LookupEngine.Tests.Performance;
+namespace LookupEngine.Tests.Performance.Benchmarks;
 
-[MediumRunJob]
-[MemoryDiagnoser(false)]
-public sealed class SortBenchmark
+public class SortBenchmark
 {
     private MethodInfo[] _methodInfos = null!;
 
