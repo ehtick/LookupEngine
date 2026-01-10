@@ -30,8 +30,6 @@ public partial class LookupComposer
 
     private int _depth;
     private object _input;
-    private Type? _memberDeclaringType;
-    private Descriptor? _memberDeclaringDescriptor;
     private DecomposedObject? _decomposedObject;
     private List<DecomposedMember>? _decomposedMembers;
 
@@ -68,14 +66,14 @@ public partial class LookupComposer
     {
         get
         {
-            if (_memberDeclaringType is null)
+            if (field is null)
             {
                 EngineException.ThrowIfEngineNotInitialized(nameof(MemberDeclaringType));
             }
 
-            return _memberDeclaringType;
+            return field;
         }
-        set => _memberDeclaringType = value;
+        set;
     }
 
     /// <summary>
@@ -85,13 +83,13 @@ public partial class LookupComposer
     {
         get
         {
-            if (_memberDeclaringDescriptor is null)
+            if (field is null)
             {
                 EngineException.ThrowIfEngineNotInitialized(nameof(MemberDeclaringDescriptor));
             }
 
-            return _memberDeclaringDescriptor;
+            return field;
         }
-        set => _memberDeclaringDescriptor = value;
+        set;
     }
 }

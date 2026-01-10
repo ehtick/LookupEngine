@@ -12,8 +12,6 @@ namespace LookupEngine;
 [PublicAPI]
 public class DecomposeOptions
 {
-    private Func<object?, Type?, Descriptor>? _typeResolver;
-
     /// <summary>
     ///     Decompose object root
     /// </summary>
@@ -59,8 +57,11 @@ public class DecomposeOptions
     /// </summary>
     public Func<object?, Type?, Descriptor> TypeResolver
     {
-        get { return _typeResolver ??= DefaultResolveMap; }
-        set => _typeResolver = value;
+        get
+        {
+            return field ??= DefaultResolveMap;
+        }
+        set;
     }
 
     /// <summary>
