@@ -31,7 +31,20 @@ public partial class LookupComposer
         {
             if (member.IsSpecialName) continue;
 
-            var value = EvaluateValue(member);
+            object? value;
+            try
+            {
+                value = EvaluateValue(member);
+            }
+            catch (TargetInvocationException exception)
+            {
+                value = exception.InnerException;
+            }
+            catch (Exception exception)
+            {
+                value = exception;
+            }
+
             WriteDecompositionMember(value, member);
         }
     }
