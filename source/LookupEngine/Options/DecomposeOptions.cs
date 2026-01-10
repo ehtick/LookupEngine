@@ -23,7 +23,7 @@ public class DecomposeOptions
     public bool IncludeFields { get; set; }
 
     /// <summary>
-    ///     Decompose object properties
+    ///     Include events
     /// </summary>
     public bool IncludeEvents { get; set; }
 
