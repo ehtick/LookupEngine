@@ -1,10 +1,9 @@
-name: Compile solution
+﻿name: Publish Release
 
 on:
   push:
-    branches:
+    tags:
       - '*'
-  pull_request:
 
 jobs:
   windows:
@@ -24,9 +23,9 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Build.props', 'Directory.Packages.props') }}
           restore-keys: ${{ runner.os }}-nuget-
 
-      - name: Compile solution
-        run: dotnet run -c Release
+      - name: Publish packages
+        run: dotnet run -c Release -- test publish
         working-directory: "build"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOTNET_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Development' }}
+          DOTNET_ENVIRONMENT: ${{ (github.ref_name == 'main' || github.ref_type == 'tag') && 'Production' || 'Development' }}

@@ -1,5 +1,0 @@
-{
-  "$schema": "./build.schema.json",
-  "Solution": "LookupEngine.sln",
-  "Verbosity": "Normal"
-}

@@ -8,12 +8,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Testing -->
-        <PackageVersion Include="BenchmarkDotNet" Version="0.15.8"/>
-        <PackageVersion Include="TUnit" Version="1.9.45"/>
+        <!-- Build Automation -->
+        <PackageVersion Include="Sourcy.DotNet" Version="1.0.0"/>
+        <PackageVersion Include="ModularPipelines" Version="2.48.30"/>
+        <PackageVersion Include="ModularPipelines.Git" Version="2.48.30"/>
+        <PackageVersion Include="ModularPipelines.GitHub" Version="2.48.30"/>
+        <PackageVersion Include="ModularPipelines.DotNet" Version="2.48.30"/>
+        <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.1"/>
 
-        <!-- Build -->
-        <PackageVersion Include="Nuke.Common" Version="9.0.4"/>
+        <!-- Testing -->
+        <PackageVersion Include="TUnit" Version="1.9.64"/>
+        <PackageVersion Include="Shouldly" Version="4.3.0"/>
+        <PackageVersion Include="BenchmarkDotNet" Version="0.15.8"/>
+
+        <!-- Development Tools -->
         <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4"/>
     </ItemGroup>
 
