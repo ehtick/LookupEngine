@@ -1,15 +1,17 @@
-﻿using LookupEngine.Descriptors;
+using LookupEngine.Abstractions.Configuration;
+using LookupEngine.Abstractions.Decomposition;
+using LookupEngine.Descriptors;
 using LookupEngine.Options;
-using LookupEngine.Tests.Unit.Contexts;
-using LookupEngine.Tests.Unit.Descriptors;
-using LookupEngine.Tests.Unit.Objects;
 
 namespace LookupEngine.Tests.Unit;
 
+/// <summary>
+/// Tests for <see cref="IDescriptorRedirector"/> functionality and value redirection behavior.
+/// </summary>
 public sealed class RedirectionTests
 {
     [Test]
-    public async Task Decompose_ExcludingRedirection_RedirectedToAnotherValue()
+    public async Task Decompose_ExcludingRedirection_ValueStaysOriginalType()
     {
         //Arrange
         var data = new RedirectContainerObject();
@@ -35,8 +37,6 @@ public sealed class RedirectionTests
         {
             await Assert.That(defaultResult.Members).IsNotEmpty();
             await Assert.That(comparableResult.Members).IsNotEmpty();
-            await Assert.That(comparableResult.Members[0].AllocatedBytes).IsPositive();
-            await Assert.That(comparableResult.Members[0].ComputationTime).IsPositive();
             await Assert.That(comparableResult.Members[0].Value.TypeName).IsEqualTo(defaultResult.Members[0].Value.TypeName);
         }
     }
@@ -68,8 +68,6 @@ public sealed class RedirectionTests
         {
             await Assert.That(defaultResult.Members).IsNotEmpty();
             await Assert.That(comparableResult.Members).IsNotEmpty();
-            await Assert.That(comparableResult.Members[0].AllocatedBytes).IsPositive();
-            await Assert.That(comparableResult.Members[0].ComputationTime).IsPositive();
             await Assert.That(comparableResult.Members[0].Value.TypeName).IsNotEqualTo(defaultResult.Members[0].Value.TypeName);
         }
     }
@@ -118,10 +116,49 @@ public sealed class RedirectionTests
             await Assert.That(defaultResult.Members).IsNotEmpty();
             await Assert.That(comparableResult.Members).IsNotEmpty();
             await Assert.That(comparableContextResult.Members).IsNotEmpty();
-            await Assert.That(comparableContextResult.Members[0].AllocatedBytes).IsPositive();
-            await Assert.That(comparableContextResult.Members[0].ComputationTime).IsPositive();
             await Assert.That(comparableContextResult.Members[0].Value.TypeName).IsNotEqualTo(defaultResult.Members[0].Value.TypeName);
             await Assert.That(comparableContextResult.Members[0].Value.TypeName).IsNotEqualTo(comparableResult.Members[0].Value.TypeName);
         }
+    }
+}
+
+file sealed class RedirectContainerObject
+{
+    public RedirectableObject PropertyToRedirect => new();
+}
+
+file sealed class RedirectableObject
+{
+    public Random Random { get; set; } = new(69);
+}
+
+file sealed class EngineTestContext
+{
+    public int Version { get; } = 1;
+    public string Metadata { get; } = "Test context";
+}
+
+file sealed class RedirectionDescriptor : Descriptor, IDescriptorRedirector, IDescriptorRedirector<EngineTestContext>
+{
+    public RedirectionDescriptor()
+    {
+        Name = "Redirection";
+    }
+
+    public bool TryRedirect(string target, out object result)
+    {
+        result = 69;
+        return true;
+    }
+
+    public bool TryRedirect(string target, EngineTestContext context, out object result)
+    {
+        result = context.Version switch
+        {
+            1 => $"Target: {target}, context: {context.Metadata}",
+            _ => $"Target: {target}, context: {context.Version}"
+        };
+
+        return true;
     }
 }

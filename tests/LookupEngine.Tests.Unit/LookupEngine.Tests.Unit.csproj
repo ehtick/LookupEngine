@@ -6,7 +6,6 @@
 
     <ItemGroup>
         <PackageReference Include="TUnit"/>
-        <PackageReference Include="Bogus"/>
     </ItemGroup>
 
     <ItemGroup>

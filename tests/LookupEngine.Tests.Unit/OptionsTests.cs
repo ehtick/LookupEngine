@@ -1,15 +1,17 @@
-﻿using Bogus;
-using LookupEngine.Tests.Unit.Objects;
+using JetBrains.Annotations;
 
 namespace LookupEngine.Tests.Unit;
 
+/// <summary>
+/// Tests for <see cref="DecomposeOptions"/> configuration and its effect on decomposition behavior.
+/// </summary>
 public sealed class OptionsTests
 {
     [Test]
     public async Task Decompose_DefaultOptions_HasMembers()
     {
         //Arrange
-        var data = new Faker().Random.String();
+        var data = "TestString";
 
         //Act
         var defaultResult = LookupComposer.Decompose(data);
@@ -40,7 +42,7 @@ public sealed class OptionsTests
     public async Task Decompose_IncludingPrivate_HasPrivateMembers()
     {
         //Arrange
-        var data = new Faker().Random.String();
+        var data = "TestString";
         var options = new DecomposeOptions
         {
             IncludePrivateMembers = true,
@@ -58,7 +60,7 @@ public sealed class OptionsTests
     public async Task Decompose_IncludingUnsupported_HasUnsupported()
     {
         //Arrange
-        var data = new Faker().Random.String();
+        var data = "TestString";
         var options = new DecomposeOptions
         {
             IncludeUnsupported = true
@@ -76,7 +78,7 @@ public sealed class OptionsTests
     public async Task Decompose_IncludingRoot_HasRootMembers()
     {
         //Arrange
-        var data = new Faker().Random.String();
+        var data = "TestString";
         var options = new DecomposeOptions
         {
             IncludeRoot = true
@@ -94,7 +96,7 @@ public sealed class OptionsTests
     public async Task Decompose_IncludingStatic_HasStaticMembers()
     {
         //Arrange
-        var data = new Faker().Date.Future();
+        var data = DateTime.Now;
         var options = new DecomposeOptions
         {
             IncludeStaticMembers = true
@@ -125,4 +127,10 @@ public sealed class OptionsTests
         //Assert
         await Assert.That(comparableResult.Members.Count).IsGreaterThan(defaultResult.Members.Count);
     }
+}
+
+[PublicAPI]
+file sealed class PublicFieldsObject
+{
+    public string? Field;
 }

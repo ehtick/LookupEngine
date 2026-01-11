@@ -1,11 +1,13 @@
-﻿using LookupEngine.Descriptors;
+using LookupEngine.Abstractions.Configuration;
+using LookupEngine.Abstractions.Decomposition;
+using LookupEngine.Descriptors;
 using LookupEngine.Options;
-using LookupEngine.Tests.Unit.Contexts;
-using LookupEngine.Tests.Unit.Descriptors;
-using LookupEngine.Tests.Unit.Objects;
 
 namespace LookupEngine.Tests.Unit;
 
+/// <summary>
+/// Tests for <see cref="IDescriptorExtension"/> functionality and context data enrichment.
+/// </summary>
 public sealed class ExtensionTests
 {
     [Test]
@@ -86,8 +88,46 @@ public sealed class ExtensionTests
             await Assert.That(comparableContextResult.Members).IsNotEmpty();
             await Assert.That(comparableContextResult.Members[0].AllocatedBytes).IsPositive();
             await Assert.That(comparableContextResult.Members[0].ComputationTime).IsPositive();
-            await Assert.That(comparableContextResult.Members[0].ComputationTime).IsPositive();
             await Assert.That(comparableContextResult.Members.Count).IsGreaterThan(comparableResult.Members.Count);
+        }
+    }
+}
+
+file sealed class ExtensibleObject;
+
+file sealed class EngineTestContext
+{
+    public int Version { get; } = 1;
+    public string Metadata { get; } = "Test context";
+}
+
+file sealed class ExtensionDescriptor : Descriptor, IDescriptorExtension, IDescriptorExtension<EngineTestContext>
+{
+    public void RegisterExtensions(IExtensionManager manager)
+    {
+        manager.Register("Extension", Extension);
+        return;
+
+        IVariant Extension()
+        {
+            return Variants.Value("Extended");
+        }
+    }
+
+    public void RegisterExtensions(IExtensionManager<EngineTestContext> manager)
+    {
+        manager.Register("VersionExtension", VersionExtension);
+        manager.Register("MetadataExtension", MetadataExtension);
+        return;
+
+        IVariant VersionExtension(EngineTestContext context)
+        {
+            return Variants.Value(context.Version);
+        }
+
+        IVariant MetadataExtension(EngineTestContext context)
+        {
+            return Variants.Value(context.Metadata);
         }
     }
 }
