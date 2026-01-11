@@ -201,7 +201,7 @@ private void DecomposeProperties(BindingFlags bindingFlags)
    public void Decompose_NullValue_ReturnsNullableDecomposition()
    {
        var result = LookupComposer.Decompose(null);
-       Assert.Equal("Object", result.TypeName);
+       Assert.Equal(nameof(Object), result.TypeName);
    }
    ```
 
