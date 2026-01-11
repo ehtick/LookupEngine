@@ -23,9 +23,10 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Build.props', 'Directory.Packages.props') }}
           restore-keys: ${{ runner.os }}-nuget-
 
-      - name: Publish packages
+      - name: Publish release
         run: dotnet run -c Release -- test publish
         working-directory: "build"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTNET_ENVIRONMENT: ${{ (github.ref_name == 'main' || github.ref_type == 'tag') && 'Production' || 'Development' }}
+          Publish__Version: ${{ github.ref_name }}
