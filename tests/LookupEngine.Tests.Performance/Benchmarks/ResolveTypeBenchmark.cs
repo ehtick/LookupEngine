@@ -20,26 +20,26 @@ public class ResolveTypeBenchmark
 {
     private static object Obj => "Text";
 
-    [Benchmark]
-    public bool TypeIsEquals()
+    [Benchmark(Baseline = true)]
+    public bool PatternMatchingIs()
     {
         return Obj is IDisposable;
     }
 
     [Benchmark]
-    public bool NamespaceEquals()
+    public bool NamespaceStringEquality()
     {
         return Obj.GetType().Namespace == "System";
     }
 
     [Benchmark]
-    public bool NamespaceStartsWith()
+    public bool NamespaceStringPrefix()
     {
         return Obj.GetType().Namespace!.StartsWith("System");
     }
 
     [Benchmark]
-    public bool AssemblyStartsWith()
+    public bool AssemblyFullNamePrefix()
     {
         return Obj.GetType().Assembly.FullName!.StartsWith("System");
     }

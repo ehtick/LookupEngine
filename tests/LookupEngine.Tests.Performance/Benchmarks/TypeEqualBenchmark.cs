@@ -23,25 +23,25 @@ public class TypeEqualBenchmark
     [Params(null, typeof(ButtonBase))]
     public Type? Type { get; set; }
 
-    [Benchmark]
-    public string? FindValue1()
+    [Benchmark(Baseline = true)]
+    public string? PatternMatching()
     {
-        return FindValue1(Object);
+        return PatternMatchingSwitch(Object);
     }
 
     [Benchmark]
-    public string? FindValue2()
+    public string? PatternMatchingWithTypeEquality()
     {
-        return FindValue2(Object, Type);
+        return PatternMatchingWithTypeCheck(Object, Type);
     }
 
     [Benchmark]
-    public string? FindValue3()
+    public string? PatternMatchingWithFullNameEquality()
     {
-        return FindValue3(Object, Type);
+        return PatternMatchingWithFullName(Object, Type);
     }
 
-    private string? FindValue1(object? obj)
+    private string? PatternMatchingSwitch(object? obj)
     {
         return obj switch
         {
@@ -52,7 +52,7 @@ public class TypeEqualBenchmark
         };
     }
 
-    private string? FindValue2(object? obj, Type? type)
+    private string? PatternMatchingWithTypeCheck(object? obj, Type? type)
     {
         return obj switch
         {
@@ -63,7 +63,7 @@ public class TypeEqualBenchmark
         };
     }
 
-    private string? FindValue3(object? obj, Type? type)
+    private string? PatternMatchingWithFullName(object? obj, Type? type)
     {
         return obj switch
         {
@@ -75,14 +75,8 @@ public class TypeEqualBenchmark
     }
 }
 
-public class ButtonBase
-{
-}
+public class ButtonBase;
 
-public class Button : ButtonBase
-{
-}
+public class Button : ButtonBase;
 
-public sealed class RoundButton : Button
-{
-}
+public sealed class RoundButton : Button;

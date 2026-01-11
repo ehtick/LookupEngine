@@ -28,8 +28,8 @@ public class SortBenchmark
         _methodInfos = obj.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
     }
 
-    [Benchmark]
-    public void Linq()
+    [Benchmark(Baseline = true)]
+    public void LinqOrderBy()
     {
         var enumerable = _methodInfos.OrderBy(info => info.Name);
         foreach (var methodInfo in enumerable)
@@ -39,7 +39,7 @@ public class SortBenchmark
     }
 
     [Benchmark]
-    public void SortComparer()
+    public void ArraySortWithComparer()
     {
         Array.Sort(_methodInfos, new MethodInfoComparer());
         foreach (var methodInfo in _methodInfos)
@@ -49,7 +49,7 @@ public class SortBenchmark
     }
 
     [Benchmark]
-    public void SortComparison()
+    public void ArraySortWithComparison()
     {
         Array.Sort(_methodInfos, Comparison);
         foreach (var methodInfo in _methodInfos)

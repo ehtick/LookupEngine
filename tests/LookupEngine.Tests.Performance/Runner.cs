@@ -6,10 +6,14 @@ using BenchmarkDotNet.Running;
 using LookupEngine.Tests.Performance.Benchmarks;
 
 var configuration = ManualConfig.Create(DefaultConfig.Instance)
-    .AddJob(Job.MediumRun)
+    .AddJob(Job.ShortRun)
     .AddDiagnoser(MemoryDiagnoser.Default)
     .AddExporter(MarkdownExporter.GitHub);
 
-BenchmarkRunner.Run<ResolveTypeBenchmark>(configuration);
+// BenchmarkRunner.Run<FormatTypeNameBenchmark>(configuration);
+// BenchmarkRunner.Run<TypeHierarchyBenchmark>(configuration);
+// BenchmarkRunner.Run<MemberEnumerationBenchmark>(configuration);
+
+// BenchmarkRunner.Run<ResolveTypeBenchmark>(configuration);
 // BenchmarkRunner.Run<SortBenchmark>(configuration);
-// BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
+BenchmarkRunner.Run<TypeEqualBenchmark>(configuration);
