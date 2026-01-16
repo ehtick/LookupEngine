@@ -40,9 +40,6 @@ public partial class LookupComposer
         _input = value;
         _options = options;
     }
-#if NETFRAMEWORK
-#pragma warning disable CS8603 // Possible null reference return.
-#endif
 
     /// <summary>
     ///     Decomposed members of the input object
@@ -94,7 +91,4 @@ public partial class LookupComposer
         }
         set;
     }
-#if NETFRAMEWORK
-#pragma warning restore CS8603 // Possible null reference return.
-#endif
 }

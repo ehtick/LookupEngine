@@ -1,8 +1,4 @@
-﻿#if NET
-using System.Diagnostics.CodeAnalysis;
-#else
-using JetBrains.Annotations;
-#endif
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace LookupEngine.Exceptions;
 
@@ -11,11 +7,7 @@ namespace LookupEngine.Exceptions;
 /// </summary>
 public sealed class EngineException(string message) : Exception(message)
 {
-#if NET
     [DoesNotReturn]
-#else
-    [ContractAnnotation("=> halt")]
-#endif
     internal static void ThrowIfEngineNotInitialized(string propertyName)
     {
         throw new EngineException($"LookupEngine internal error. {propertyName} must be initialized before accessing it.");
