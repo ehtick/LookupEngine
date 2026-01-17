@@ -1,10 +1,12 @@
 using Build.Options;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using ModularPipelines.Attributes;
 using ModularPipelines.Context;
-using ModularPipelines.Enums;
 using ModularPipelines.Git.Extensions;
 using ModularPipelines.Git.Options;
 using ModularPipelines.Modules;
+using ModularPipelines.Options;
 using Shouldly;
 
 namespace Build.Modules;
@@ -12,12 +14,13 @@ namespace Build.Modules;
 /// <summary>
 ///     Resolve semantic versions for compiling and publishing the templates.
 /// </summary>
-public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOptions) : Module<ResolveVersioningResult>
+[ModuleCategory("publish")]
+public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOptions, IHostEnvironment environment) : Module<ResolveVersioningResult>
 {
-    protected override async Task<ResolveVersioningResult?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task<ResolveVersioningResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         var version = publishOptions.Value.Version;
-        if (context.Environment.EnvironmentName == "Production")
+        if (environment.IsProduction())
         {
             version.ShouldNotBeNullOrWhiteSpace();
         }
@@ -47,27 +50,35 @@ public sealed class ResolveBuildVersionModule(IOptions<PublishOptions> publishOp
     /// </summary>
     private static async Task<string> FetchPreviousVersionAsync(IPipelineContext context)
     {
-        var describeResult = await context.Git().Commands.Describe(new GitDescribeOptions
-        {
-            Tags = true,
-            Abbrev = "0",
-            Arguments = ["HEAD^"],
-            ThrowOnNonZeroExitCode = false,
-            CommandLogging = CommandLogging.None
-        });
+        var describeResult = await context.Git().Commands.Describe(
+            new GitDescribeOptions
+            {
+                Tags = true,
+                Abbrev = "0",
+                Arguments = ["HEAD^"],
+            },
+            new CommandExecutionOptions
+            {
+                ThrowOnNonZeroExitCode = false,
+                LogSettings = CommandLoggingOptions.Silent
+            });
 
         var previousTag = describeResult.StandardOutput.Trim();
         if (!string.IsNullOrWhiteSpace(previousTag)) return previousTag;
 
-        var revisionResult = await context.Git().Commands.RevList(new GitRevListOptions
-        {
-            MaxParents = "0",
-            MaxCount = "1",
-            Pretty = "format:%H",
-            Arguments = ["HEAD"],
-            NoCommitHeader = true,
-            CommandLogging = CommandLogging.None
-        });
+        var revisionResult = await context.Git().Commands.RevList(
+            new GitRevListOptions
+            {
+                MaxParents = "0",
+                MaxCount = "1",
+                Pretty = "format:%H",
+                Arguments = ["HEAD"],
+                NoCommitHeader = true,
+            },
+            new CommandExecutionOptions
+            {
+                LogSettings = CommandLoggingOptions.Silent
+            });
 
         return revisionResult.StandardOutput.Trim();
     }

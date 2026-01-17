@@ -11,16 +11,16 @@ namespace Build.Modules;
 /// <summary>
 ///     Compile the project.
 /// </summary>
+[ModuleCategory("compile")]
 [DependsOn<CleanProjectModule>]
 public sealed class CompileProjectModule : Module<CommandResult>
 {
-    protected override async Task<CommandResult?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task<CommandResult?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
         return await context.DotNet().Build(new DotNetBuildOptions
         {
             ProjectSolution = Projects.LookupEngine.FullName,
-            Configuration = Configuration.Release,
-            Verbosity = Verbosity.Minimal
-        }, cancellationToken);
+            Configuration = "Release"
+        }, cancellationToken: cancellationToken);
     }
 }

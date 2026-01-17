@@ -1,38 +1,18 @@
-﻿using Build.Modules;
-using Build.Options;
+﻿using Build.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ModularPipelines;
 using ModularPipelines.Extensions;
-using ModularPipelines.Host;
 
-await PipelineHostBuilder.Create()
-    .ConfigureAppConfiguration((context, builder) =>
-    {
-        builder.AddJsonFile("appsettings.json")
-            .AddUserSecrets<Program>()
-            .AddEnvironmentVariables();
-    })
-    .ConfigureServices((context, collection) =>
-    {
-        if (args.Length == 0)
-        {
-            collection.AddModule<CleanProjectModule>();
-            collection.AddModule<CompileProjectModule>();
-        }
+var builder = Pipeline.CreateBuilder();
 
-        if (args.Contains("test"))
-        {
-            collection.AddModule<TestProjectModule>();
-        }
+builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration.AddUserSecrets<Program>();
+builder.Configuration.AddEnvironmentVariables();
 
-        if (args.Contains("publish"))
-        {
-            collection.AddOptions<PublishOptions>().Bind(context.Configuration.GetSection("Publish")).ValidateDataAnnotations();
+builder.Services.AddOptions<PublishOptions>().Bind(builder.Configuration.GetSection("Publish")).ValidateDataAnnotations();
+builder.Services.AddModulesFromAssemblyContainingType<Program>();
 
-            collection.AddModule<ResolveBuildVersionModule>();
-            collection.AddModule<GenerateChangelogModule>();
-            collection.AddModule<GenerateGitHubChangelogModule>();
-            collection.AddModule<PublishGithubModule>();
-        }
-    })
-    .ExecutePipelineAsync();
+builder.Options.RunOnlyCategories = args.Length == 0 ? ["compile"] : args;
+
+await builder.Build().RunAsync();

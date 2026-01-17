@@ -6,7 +6,6 @@ using ModularPipelines.GitHub.Attributes;
 using ModularPipelines.GitHub.Extensions;
 using ModularPipelines.Modules;
 using Octokit;
-using Status = ModularPipelines.Enums.Status;
 
 namespace Build.Modules;
 
@@ -14,17 +13,18 @@ namespace Build.Modules;
 ///     Publish the templates to GitHub.
 /// </summary>
 [SkipIfNoGitHubToken]
+[ModuleCategory("publish")]
 [DependsOn<ResolveBuildVersionModule>]
 [DependsOn<GenerateGitHubChangelogModule>]
 public sealed class PublishGithubModule : Module<Release?>
 {
-    protected override async Task<Release?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task<Release?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveBuildVersionModule>();
-        var changelogResult = await GetModule<GenerateGitHubChangelogModule>();
+        var versioningResult = await context.GetModule<ResolveBuildVersionModule>();
+        var changelogResult = await context.GetModule<GenerateGitHubChangelogModule>();
 
-        var versioning = versioningResult.Value!;
-        var changelog = changelogResult.Value!;
+        var versioning = versioningResult.ValueOrDefault!;
+        var changelog = changelogResult.ValueOrDefault!;
 
         var repositoryInfo = context.GitHub().RepositoryInfo;
         var newRelease = new NewRelease(versioning.Version)
@@ -38,18 +38,15 @@ public sealed class PublishGithubModule : Module<Release?>
         return await context.GitHub().Client.Repository.Release.Create(repositoryInfo.Owner, repositoryInfo.RepositoryName, newRelease);
     }
 
-    protected override async Task OnAfterExecute(IPipelineContext context)
+    protected override async Task OnFailedAsync(IModuleContext context, Exception exception, CancellationToken cancellationToken)
     {
-        if (Status == Status.Failed)
-        {
-            var versioningResult = await GetModule<ResolveBuildVersionModule>();
-            var versioning = versioningResult.Value!;
+        var versioningResult = await context.GetModule<ResolveBuildVersionModule>();
+        var versioning = versioningResult.ValueOrDefault!;
 
-            await context.Git().Commands.Push(new GitPushOptions
-            {
-                Delete = true,
-                Arguments = ["origin", versioning.Version]
-            });
-        }
+        await context.Git().Commands.Push(new GitPushOptions
+        {
+            Delete = true,
+            Arguments = ["origin", versioning.Version]
+        }, token: cancellationToken);
     }
 }

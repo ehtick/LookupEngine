@@ -13,13 +13,14 @@ namespace Build.Modules;
 /// <summary>
 ///     Generate the changelog for publishing the templates.
 /// </summary>
+[ModuleCategory("publish")]
 [DependsOn<ResolveBuildVersionModule>]
 public sealed class GenerateChangelogModule(IOptions<PublishOptions> publishOptions) : Module<string>
 {
-    protected override async Task<string?> ExecuteAsync(IPipelineContext context, CancellationToken cancellationToken)
+    protected override async Task<string?> ExecuteAsync(IModuleContext context, CancellationToken cancellationToken)
     {
-        var versioningResult = await GetModule<ResolveBuildVersionModule>();
-        var versioning = versioningResult.Value!;
+        var versioningResult = await context.GetModule<ResolveBuildVersionModule>();
+        var versioning = versioningResult.ValueOrDefault!;
 
         var changelogFile = context.Git().RootDirectory.GetFile(publishOptions.Value.ChangelogFile);
 
@@ -39,7 +40,7 @@ public sealed class GenerateChangelogModule(IOptions<PublishOptions> publishOpti
         var isChangelogEntryFound = false;
         var changelog = new StringBuilder();
 
-        foreach (var line in await changelogFile.ReadLinesAsync())
+        await foreach (var line in changelogFile.ReadLinesAsync())
         {
             if (isChangelogEntryFound)
             {
